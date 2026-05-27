@@ -90,16 +90,16 @@ export function generateRevenueSeries(days = 30): { date: string; revenue: numbe
 }
 
 const ALERT_TEMPLATES: { severity: Severity; message: string }[] = [
-  { severity: "info", message: "Director rebalanced agent workload" },
-  { severity: "info", message: "New campaign deployed by Marketer" },
-  { severity: "warning", message: "API rate limit approaching (82%)" },
-  { severity: "warning", message: "Sales conversion below 7-day average" },
-  { severity: "critical", message: "Compliance flagged outbound message" },
-  { severity: "info", message: "Finance reconciled $1,204 in payouts" },
-  { severity: "warning", message: "Creator output queue backing up" },
-  { severity: "info", message: "Quality approved 24 artifacts" },
-  { severity: "critical", message: "Anomalous spend detected: $312 in 5m" },
-  { severity: "info", message: "Researcher updated market index" },
+  { severity: "info", message: "El Director rebalanceó la carga de los agentes" },
+  { severity: "info", message: "Nueva campaña desplegada por Marketing" },
+  { severity: "warning", message: "Límite de API cercano al máximo (82%)" },
+  { severity: "warning", message: "Conversión de Ventas bajo el promedio de 7 días" },
+  { severity: "critical", message: "Cumplimiento marcó un mensaje saliente" },
+  { severity: "info", message: "Finanzas reconcilió $1,204 en pagos" },
+  { severity: "warning", message: "Cola de salida del Creador acumulándose" },
+  { severity: "info", message: "Calidad aprobó 24 artefactos" },
+  { severity: "critical", message: "Gasto anómalo detectado: $312 en 5m" },
+  { severity: "info", message: "Investigador actualizó el índice de mercado" },
 ];
 
 export function generateAlerts(n = 10): Alert[] {
