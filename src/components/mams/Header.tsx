@@ -26,10 +26,10 @@ export function Header() {
           </div>
           <div>
             <h1 className="text-base font-bold tracking-tight text-foreground">
-              MAMS <span className="text-muted-foreground font-normal">— Matrix Agentic Money System</span>
+              MAMS <span className="text-muted-foreground font-normal">— Sistema Matricial Agéntico de Dinero</span>
             </h1>
             <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
-              <Activity className="w-3 h-3" /> Multi-agent autonomous money system · v1.0
+              <Activity className="w-3 h-3" /> Sistema autónomo multi-agente de dinero · v1.0
             </p>
           </div>
         </div>
