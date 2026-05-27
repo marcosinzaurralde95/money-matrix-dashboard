@@ -9,8 +9,8 @@ const statusColor = {
 };
 
 const statusLabel = {
-  active: "Active",
-  idle: "Idle",
+  active: "Activo",
+  idle: "Inactivo",
   error: "Error",
 };
 
