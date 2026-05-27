@@ -50,7 +50,7 @@ export function Header() {
           </div>
 
           <Badge variant="outline" className={modeColors[mode]}>
-            Mode: {mode}
+            Modo: {mode}
           </Badge>
 
           <div
@@ -59,7 +59,7 @@ export function Header() {
             }`}
           >
             <span className={`text-[11px] font-bold uppercase tracking-wider ${killed ? "text-red-300" : "text-red-400"}`}>
-              {killed ? "KILLED" : "Kill Switch"}
+              {killed ? "DETENIDO" : "Interruptor de emergencia"}
             </span>
             <Switch checked={killed} onCheckedChange={setKilled} className="data-[state=checked]:bg-red-500" />
           </div>
