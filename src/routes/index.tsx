@@ -54,7 +54,7 @@ function Dashboard() {
         </section>
 
         <footer className="text-center text-[11px] text-muted-foreground py-4">
-          MAMS Dashboard · Auto-refresh every 5s · Mock data simulation
+          Panel MAMS · Actualización automática cada 5s · Simulación con datos de prueba
         </footer>
       </main>
     </div>
