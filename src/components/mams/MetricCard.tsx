@@ -30,7 +30,7 @@ export function MetricCard({ label, value, target, period }: Props) {
             {pct.toFixed(1)}%
           </span>
           <span className={ahead ? "text-emerald-400" : "text-amber-400"}>
-            {ahead ? "On target" : `$${(target - value).toLocaleString()} to go`}
+            {ahead ? "En objetivo" : `Faltan $${(target - value).toLocaleString()}`}
           </span>
         </div>
       </div>
