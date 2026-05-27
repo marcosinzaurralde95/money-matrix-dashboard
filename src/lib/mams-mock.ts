@@ -32,27 +32,27 @@ export const TARGETS = {
 };
 
 const AGENT_SEED: Omit<Agent, "status" | "lastAction" | "lastActionAt">[] = [
-  { id: "director", name: "Director", role: "Chief Executive Orchestrator" },
-  { id: "researcher", name: "Researcher", role: "Market Intelligence Specialist" },
-  { id: "creator", name: "Creator", role: "Content Production Specialist" },
-  { id: "marketer", name: "Marketer", role: "Growth & Distribution" },
-  { id: "sales", name: "Sales", role: "Revenue Conversion" },
-  { id: "analyst", name: "Analyst", role: "Data & Insights" },
-  { id: "quality", name: "Quality", role: "QA & Standards" },
-  { id: "compliance", name: "Compliance", role: "Risk & Legal" },
-  { id: "finance", name: "Finance", role: "Treasury & Accounting" },
+  { id: "director", name: "Director", role: "Orquestador Ejecutivo Principal" },
+  { id: "researcher", name: "Investigador", role: "Especialista en Inteligencia de Mercado" },
+  { id: "creator", name: "Creador", role: "Especialista en Producción de Contenido" },
+  { id: "marketer", name: "Marketing", role: "Crecimiento y Distribución" },
+  { id: "sales", name: "Ventas", role: "Conversión de Ingresos" },
+  { id: "analyst", name: "Analista", role: "Datos e Insights" },
+  { id: "quality", name: "Calidad", role: "QA y Estándares" },
+  { id: "compliance", name: "Cumplimiento", role: "Riesgo y Legal" },
+  { id: "finance", name: "Finanzas", role: "Tesorería y Contabilidad" },
 ];
 
 const ACTIONS: Record<string, string[]> = {
-  director: ["Allocated tasks to 4 agents", "Reviewed quarterly OKRs", "Approved $240 ad spend"],
-  researcher: ["Scraped 128 competitor pages", "Identified 3 emerging trends", "Updated keyword index"],
-  creator: ["Generated 5 long-form posts", "Produced 12 social variants", "Drafted email sequence"],
-  marketer: ["Pushed campaign to LinkedIn", "A/B test launched", "Scheduled 8 posts"],
-  sales: ["Closed deal: $189", "Sent 24 outbound emails", "Booked 3 demos"],
-  analyst: ["Computed conversion deltas", "Built funnel report", "Detected CTR anomaly"],
-  quality: ["Reviewed 18 outputs", "Flagged 1 hallucination", "Approved content batch"],
-  compliance: ["Scanned 42 docs for PII", "Reviewed TOS update", "Cleared 3 disclosures"],
-  finance: ["Reconciled Stripe payouts", "Updated cashflow model", "Logged $412 revenue"],
+  director: ["Asignó tareas a 4 agentes", "Revisó OKRs trimestrales", "Aprobó $240 en publicidad"],
+  researcher: ["Analizó 128 páginas de competencia", "Identificó 3 tendencias emergentes", "Actualizó índice de palabras clave"],
+  creator: ["Generó 5 publicaciones largas", "Produjo 12 variantes sociales", "Redactó secuencia de email"],
+  marketer: ["Lanzó campaña en LinkedIn", "Inició prueba A/B", "Programó 8 publicaciones"],
+  sales: ["Cerró trato: $189", "Envió 24 correos en frío", "Agendó 3 demos"],
+  analyst: ["Calculó deltas de conversión", "Generó reporte de embudo", "Detectó anomalía en CTR"],
+  quality: ["Revisó 18 resultados", "Marcó 1 alucinación", "Aprobó lote de contenido"],
+  compliance: ["Escaneó 42 docs por PII", "Revisó actualización de TOS", "Validó 3 divulgaciones"],
+  finance: ["Reconcilió pagos de Stripe", "Actualizó modelo de flujo", "Registró $412 de ingresos"],
 };
 
 function rand<T>(arr: T[]): T {
