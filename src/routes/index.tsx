@@ -13,8 +13,8 @@ import { TARGETS } from "@/lib/mams-mock";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "MAMS — Matrix Agentic Money System" },
-      { name: "description", content: "Real-time dashboard for a multi-agent autonomous money system." },
+      { title: "MAMS — Sistema Matricial Agéntico de Dinero" },
+      { name: "description", content: "Panel en tiempo real para un sistema autónomo multi-agente de dinero." },
     ],
   }),
   component: Dashboard,
