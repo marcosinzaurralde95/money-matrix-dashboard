@@ -32,27 +32,27 @@ export const TARGETS = {
 };
 
 const AGENT_SEED: Omit<Agent, "status" | "lastAction" | "lastActionAt">[] = [
-  { id: "director", name: "Director", role: "Chief Executive Orchestrator" },
-  { id: "researcher", name: "Researcher", role: "Market Intelligence Specialist" },
-  { id: "creator", name: "Creator", role: "Content Production Specialist" },
-  { id: "marketer", name: "Marketer", role: "Growth & Distribution" },
-  { id: "sales", name: "Sales", role: "Revenue Conversion" },
-  { id: "analyst", name: "Analyst", role: "Data & Insights" },
-  { id: "quality", name: "Quality", role: "QA & Standards" },
-  { id: "compliance", name: "Compliance", role: "Risk & Legal" },
-  { id: "finance", name: "Finance", role: "Treasury & Accounting" },
+  { id: "director", name: "Director", role: "Orquestador Ejecutivo Principal" },
+  { id: "researcher", name: "Investigador", role: "Especialista en Inteligencia de Mercado" },
+  { id: "creator", name: "Creador", role: "Especialista en Producción de Contenido" },
+  { id: "marketer", name: "Marketing", role: "Crecimiento y Distribución" },
+  { id: "sales", name: "Ventas", role: "Conversión de Ingresos" },
+  { id: "analyst", name: "Analista", role: "Datos e Insights" },
+  { id: "quality", name: "Calidad", role: "QA y Estándares" },
+  { id: "compliance", name: "Cumplimiento", role: "Riesgo y Legal" },
+  { id: "finance", name: "Finanzas", role: "Tesorería y Contabilidad" },
 ];
 
 const ACTIONS: Record<string, string[]> = {
-  director: ["Allocated tasks to 4 agents", "Reviewed quarterly OKRs", "Approved $240 ad spend"],
-  researcher: ["Scraped 128 competitor pages", "Identified 3 emerging trends", "Updated keyword index"],
-  creator: ["Generated 5 long-form posts", "Produced 12 social variants", "Drafted email sequence"],
-  marketer: ["Pushed campaign to LinkedIn", "A/B test launched", "Scheduled 8 posts"],
-  sales: ["Closed deal: $189", "Sent 24 outbound emails", "Booked 3 demos"],
-  analyst: ["Computed conversion deltas", "Built funnel report", "Detected CTR anomaly"],
-  quality: ["Reviewed 18 outputs", "Flagged 1 hallucination", "Approved content batch"],
-  compliance: ["Scanned 42 docs for PII", "Reviewed TOS update", "Cleared 3 disclosures"],
-  finance: ["Reconciled Stripe payouts", "Updated cashflow model", "Logged $412 revenue"],
+  director: ["Asignó tareas a 4 agentes", "Revisó OKRs trimestrales", "Aprobó $240 en publicidad"],
+  researcher: ["Analizó 128 páginas de competencia", "Identificó 3 tendencias emergentes", "Actualizó índice de palabras clave"],
+  creator: ["Generó 5 publicaciones largas", "Produjo 12 variantes sociales", "Redactó secuencia de email"],
+  marketer: ["Lanzó campaña en LinkedIn", "Inició prueba A/B", "Programó 8 publicaciones"],
+  sales: ["Cerró trato: $189", "Envió 24 correos en frío", "Agendó 3 demos"],
+  analyst: ["Calculó deltas de conversión", "Generó reporte de embudo", "Detectó anomalía en CTR"],
+  quality: ["Revisó 18 resultados", "Marcó 1 alucinación", "Aprobó lote de contenido"],
+  compliance: ["Escaneó 42 docs por PII", "Revisó actualización de TOS", "Validó 3 divulgaciones"],
+  finance: ["Reconcilió pagos de Stripe", "Actualizó modelo de flujo", "Registró $412 de ingresos"],
 };
 
 function rand<T>(arr: T[]): T {
@@ -81,7 +81,7 @@ export function generateRevenueSeries(days = 30): { date: string; revenue: numbe
     const base = TARGETS.daily;
     const variance = (Math.sin(i / 3) + Math.random() * 0.8 - 0.2) * base * 0.6;
     out.push({
-      date: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      date: d.toLocaleDateString("es-ES", { month: "short", day: "numeric" }),
       revenue: Math.max(0, Math.round(base + variance)),
       target: TARGETS.daily,
     });
@@ -90,16 +90,16 @@ export function generateRevenueSeries(days = 30): { date: string; revenue: numbe
 }
 
 const ALERT_TEMPLATES: { severity: Severity; message: string }[] = [
-  { severity: "info", message: "Director rebalanced agent workload" },
-  { severity: "info", message: "New campaign deployed by Marketer" },
-  { severity: "warning", message: "API rate limit approaching (82%)" },
-  { severity: "warning", message: "Sales conversion below 7-day average" },
-  { severity: "critical", message: "Compliance flagged outbound message" },
-  { severity: "info", message: "Finance reconciled $1,204 in payouts" },
-  { severity: "warning", message: "Creator output queue backing up" },
-  { severity: "info", message: "Quality approved 24 artifacts" },
-  { severity: "critical", message: "Anomalous spend detected: $312 in 5m" },
-  { severity: "info", message: "Researcher updated market index" },
+  { severity: "info", message: "El Director rebalanceó la carga de los agentes" },
+  { severity: "info", message: "Nueva campaña desplegada por Marketing" },
+  { severity: "warning", message: "Límite de API cercano al máximo (82%)" },
+  { severity: "warning", message: "Conversión de Ventas bajo el promedio de 7 días" },
+  { severity: "critical", message: "Cumplimiento marcó un mensaje saliente" },
+  { severity: "info", message: "Finanzas reconcilió $1,204 en pagos" },
+  { severity: "warning", message: "Cola de salida del Creador acumulándose" },
+  { severity: "info", message: "Calidad aprobó 24 artefactos" },
+  { severity: "critical", message: "Gasto anómalo detectado: $312 en 5m" },
+  { severity: "info", message: "Investigador actualizó el índice de mercado" },
 ];
 
 export function generateAlerts(n = 10): Alert[] {
@@ -147,12 +147,12 @@ export function currentRevenue() {
 }
 
 export function formatTime(ts: number) {
-  return new Date(ts).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  return new Date(ts).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
 export function formatRelative(ts: number) {
   const diff = Math.floor((Date.now() - ts) / 1000);
-  if (diff < 60) return `${diff}s ago`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  return `${Math.floor(diff / 3600)}h ago`;
+  if (diff < 60) return `hace ${diff}s`;
+  if (diff < 3600) return `hace ${Math.floor(diff / 60)}m`;
+  return `hace ${Math.floor(diff / 3600)}h`;
 }

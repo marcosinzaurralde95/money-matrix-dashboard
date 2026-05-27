@@ -20,15 +20,15 @@ export function RevenueChart({ data }: Props) {
     <Card className="p-4 bg-card border-border">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-semibold text-foreground">Daily Revenue</h3>
-          <p className="text-xs text-muted-foreground">Last 30 days · target ${target}/day</p>
+          <h3 className="text-sm font-semibold text-foreground">Ingresos Diarios</h3>
+          <p className="text-xs text-muted-foreground">Últimos 30 días · objetivo ${target}/día</p>
         </div>
         <div className="flex gap-3 text-[11px]">
           <span className="flex items-center gap-1.5 text-muted-foreground">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" /> Revenue
+            <span className="w-2 h-2 rounded-full bg-emerald-400" /> Ingresos
           </span>
           <span className="flex items-center gap-1.5 text-muted-foreground">
-            <span className="w-3 h-px bg-amber-400" /> Target
+            <span className="w-3 h-px bg-amber-400" /> Objetivo
           </span>
         </div>
       </div>

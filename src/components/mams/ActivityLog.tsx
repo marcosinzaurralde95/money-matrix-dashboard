@@ -6,9 +6,9 @@ export function ActivityLog({ entries }: { entries: ActivityEntry[] }) {
   return (
     <Card className="p-4 bg-card border-border">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-foreground">Activity Log</h3>
+        <h3 className="text-sm font-semibold text-foreground">Registro de Actividad</h3>
         <span className="text-[10px] text-emerald-400 flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> LIVE
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> EN VIVO
         </span>
       </div>
       <div className="space-y-1 max-h-80 overflow-y-auto pr-1 font-mono text-[11px]">

@@ -1,5 +1,4 @@
 import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 
 interface Props {
   health: { cpu: number; memory: number; apiPerMin: number; activeTasks: number };
@@ -27,12 +26,12 @@ function Gauge({ label, value, suffix = "%", max = 100 }: { label: string; value
 export function SystemHealth({ health }: Props) {
   return (
     <Card className="p-4 bg-card border-border">
-      <h3 className="text-sm font-semibold text-foreground mb-4">System Health</h3>
+      <h3 className="text-sm font-semibold text-foreground mb-4">Salud del Sistema</h3>
       <div className="space-y-3">
         <Gauge label="CPU" value={health.cpu} />
-        <Gauge label="Memory" value={health.memory} />
-        <Gauge label="API calls/min" value={health.apiPerMin} suffix="" max={400} />
-        <Gauge label="Active tasks" value={health.activeTasks} suffix="" max={40} />
+        <Gauge label="Memoria" value={health.memory} />
+        <Gauge label="Llamadas API/min" value={health.apiPerMin} suffix="" max={400} />
+        <Gauge label="Tareas activas" value={health.activeTasks} suffix="" max={40} />
       </div>
     </Card>
   );

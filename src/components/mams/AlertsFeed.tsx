@@ -12,7 +12,7 @@ const config = {
 export function AlertsFeed({ alerts }: { alerts: Alert[] }) {
   return (
     <Card className="p-4 bg-card border-border">
-      <h3 className="text-sm font-semibold text-foreground mb-3">Recent Alerts</h3>
+      <h3 className="text-sm font-semibold text-foreground mb-3">Alertas Recientes</h3>
       <div className="space-y-1.5 max-h-80 overflow-y-auto pr-1">
         {alerts.map((a) => {
           const c = config[a.severity];

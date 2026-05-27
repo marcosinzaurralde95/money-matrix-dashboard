@@ -13,8 +13,8 @@ import { TARGETS } from "@/lib/mams-mock";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "MAMS — Matrix Agentic Money System" },
-      { name: "description", content: "Real-time dashboard for a multi-agent autonomous money system." },
+      { title: "MAMS — Sistema Matricial Agéntico de Dinero" },
+      { name: "description", content: "Panel en tiempo real para un sistema autónomo multi-agente de dinero." },
     ],
   }),
   component: Dashboard,
@@ -28,10 +28,10 @@ function Dashboard() {
       <Header />
       <main className="p-6 space-y-6 max-w-[1600px] mx-auto">
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <MetricCard label="Daily Revenue" value={revenue.daily} target={TARGETS.daily} period="Today" />
-          <MetricCard label="Weekly Revenue" value={revenue.weekly} target={TARGETS.weekly} period="This week" />
-          <MetricCard label="Monthly Revenue" value={revenue.monthly} target={TARGETS.monthly} period="This month" />
-          <MetricCard label="Yearly Revenue" value={revenue.yearly} target={TARGETS.yearly} period="This year" />
+          <MetricCard label="Ingresos Diarios" value={revenue.daily} target={TARGETS.daily} period="Hoy" />
+          <MetricCard label="Ingresos Semanales" value={revenue.weekly} target={TARGETS.weekly} period="Esta semana" />
+          <MetricCard label="Ingresos Mensuales" value={revenue.monthly} target={TARGETS.monthly} period="Este mes" />
+          <MetricCard label="Ingresos Anuales" value={revenue.yearly} target={TARGETS.yearly} period="Este año" />
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -54,7 +54,7 @@ function Dashboard() {
         </section>
 
         <footer className="text-center text-[11px] text-muted-foreground py-4">
-          MAMS Dashboard · Auto-refresh every 5s · Mock data simulation
+          Panel MAMS · Actualización automática cada 5s · Simulación con datos de prueba
         </footer>
       </main>
     </div>

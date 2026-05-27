@@ -9,8 +9,8 @@ const statusColor = {
 };
 
 const statusLabel = {
-  active: "Active",
-  idle: "Idle",
+  active: "Activo",
+  idle: "Inactivo",
   error: "Error",
 };
 
@@ -18,9 +18,9 @@ export function AgentGrid({ agents }: { agents: Agent[] }) {
   return (
     <Card className="p-4 bg-card border-border">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-foreground">Agent Status</h3>
+        <h3 className="text-sm font-semibold text-foreground">Estado de Agentes</h3>
         <span className="text-[11px] text-muted-foreground">
-          {agents.filter((a) => a.status === "active").length}/{agents.length} active
+          {agents.filter((a) => a.status === "active").length}/{agents.length} activos
         </span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

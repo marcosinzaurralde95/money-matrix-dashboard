@@ -3,19 +3,19 @@ import { Switch } from "@/components/ui/switch";
 import { Activity, Zap } from "lucide-react";
 import { useState } from "react";
 
-type Mode = "Autonomous" | "Supervised" | "Debug";
+type Mode = "Autónomo" | "Supervisado" | "Depuración";
 
 export function Header() {
-  const [mode, setMode] = useState<Mode>("Autonomous");
+  const [mode, setMode] = useState<Mode>("Autónomo");
   const [killed, setKilled] = useState(false);
 
   const modeColors: Record<Mode, string> = {
-    Autonomous: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
-    Supervised: "bg-amber-500/15 text-amber-400 border-amber-500/30",
-    Debug: "bg-sky-500/15 text-sky-400 border-sky-500/30",
+    "Autónomo": "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+    "Supervisado": "bg-amber-500/15 text-amber-400 border-amber-500/30",
+    "Depuración": "bg-sky-500/15 text-sky-400 border-sky-500/30",
   };
 
-  const modes: Mode[] = ["Autonomous", "Supervised", "Debug"];
+  const modes: Mode[] = ["Autónomo", "Supervisado", "Depuración"];
 
   return (
     <header className="border-b border-border bg-card/40 backdrop-blur">
@@ -26,10 +26,10 @@ export function Header() {
           </div>
           <div>
             <h1 className="text-base font-bold tracking-tight text-foreground">
-              MAMS <span className="text-muted-foreground font-normal">— Matrix Agentic Money System</span>
+              MAMS <span className="text-muted-foreground font-normal">— Sistema Matricial Agéntico de Dinero</span>
             </h1>
             <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
-              <Activity className="w-3 h-3" /> Multi-agent autonomous money system · v1.0
+              <Activity className="w-3 h-3" /> Sistema autónomo multi-agente de dinero · v1.0
             </p>
           </div>
         </div>
@@ -50,7 +50,7 @@ export function Header() {
           </div>
 
           <Badge variant="outline" className={modeColors[mode]}>
-            Mode: {mode}
+            Modo: {mode}
           </Badge>
 
           <div
@@ -59,7 +59,7 @@ export function Header() {
             }`}
           >
             <span className={`text-[11px] font-bold uppercase tracking-wider ${killed ? "text-red-300" : "text-red-400"}`}>
-              {killed ? "KILLED" : "Kill Switch"}
+              {killed ? "DETENIDO" : "Interruptor de emergencia"}
             </span>
             <Switch checked={killed} onCheckedChange={setKilled} className="data-[state=checked]:bg-red-500" />
           </div>
