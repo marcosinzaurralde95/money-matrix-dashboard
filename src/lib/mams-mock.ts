@@ -81,7 +81,7 @@ export function generateRevenueSeries(days = 30): { date: string; revenue: numbe
     const base = TARGETS.daily;
     const variance = (Math.sin(i / 3) + Math.random() * 0.8 - 0.2) * base * 0.6;
     out.push({
-      date: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      date: d.toLocaleDateString("es-ES", { month: "short", day: "numeric" }),
       revenue: Math.max(0, Math.round(base + variance)),
       target: TARGETS.daily,
     });
