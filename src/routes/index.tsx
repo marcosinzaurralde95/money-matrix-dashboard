@@ -21,11 +21,16 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const { agents, alerts, activity, health, revenueSeries, revenue } = useMamsData();
+  const { agents, alerts, activity, health, revenueSeries, revenue, settings, updateSettings, refresh, error } = useMamsData();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Header />
+      <Header settings={settings} onChange={(p) => void updateSettings(p)} />
+      {error && (
+        <div className="mx-6 mt-4 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-2 text-xs text-destructive">
+          Error de conexión con la base de datos: {error}
+        </div>
+      )}
       <main className="p-6 space-y-6 max-w-[1600px] mx-auto">
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard label="Ingresos Diarios" value={revenue.daily} target={TARGETS.daily} period="Hoy" />
@@ -43,9 +48,9 @@ function Dashboard() {
 
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2">
-            <AgentGrid agents={agents} />
+            <AgentGrid agents={agents} onChange={refresh} />
           </div>
-          <AutonomySettings />
+          <AutonomySettings settings={settings} onSave={updateSettings} />
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -54,7 +59,7 @@ function Dashboard() {
         </section>
 
         <footer className="text-center text-[11px] text-muted-foreground py-4">
-          Panel MAMS · Actualización automática cada 5s · Simulación con datos de prueba
+          Panel MAMS · Actualización automática cada 5s · Datos guardados en Lovable Cloud · Agentes simulados
         </footer>
       </main>
     </div>

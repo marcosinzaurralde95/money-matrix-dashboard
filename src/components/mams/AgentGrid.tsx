@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import type { Agent } from "@/lib/mams-mock";
 import { formatRelative } from "@/lib/mams-mock";
+import { forceAgentRun, setAgentPaused } from "@/lib/mams-db";
 import { AgentDetailSheet } from "./AgentDetailSheet";
 
 const statusColor = {
@@ -18,10 +19,8 @@ const statusLabel = {
   paused: "Pausado",
 };
 
-export function AgentGrid({ agents }: { agents: Agent[] }) {
+export function AgentGrid({ agents, onChange }: { agents: Agent[]; onChange: () => void }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [paused, setPaused] = useState<Record<string, boolean>>({});
-  const [forced, setForced] = useState<Record<string, number>>({});
   const selected = agents.find((a) => a.id === selectedId) ?? null;
 
   return (
@@ -29,14 +28,13 @@ export function AgentGrid({ agents }: { agents: Agent[] }) {
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-foreground">Estado de Agentes</h3>
         <span className="text-[11px] text-muted-foreground">
-          {agents.filter((a) => a.status === "active" && !paused[a.id]).length}/{agents.length} activos
+          {agents.filter((a) => a.status === "active" && !a.paused).length}/{agents.length} activos
         </span>
       </div>
+      {agents.length === 0 && <p className="text-xs text-muted-foreground">Cargando agentes…</p>}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {agents.map((agent) => {
-          const st = paused[agent.id] ? "paused" : agent.status;
-          const forcedAt = forced[agent.id];
-          const recentForce = forcedAt && Date.now() - forcedAt < 60000;
+          const st = agent.paused ? "paused" : agent.status;
           return (
             <button
               type="button"
@@ -57,12 +55,8 @@ export function AgentGrid({ agents }: { agents: Agent[] }) {
                 <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{statusLabel[st]}</span>
               </div>
               <div className="mt-2 pt-2 border-t border-border/40">
-                <p className="text-[11px] text-muted-foreground line-clamp-1">
-                  {recentForce ? "Ejecución forzada manualmente" : agent.lastAction}
-                </p>
-                <p className="text-[10px] text-muted-foreground/70 mt-0.5">
-                  {formatRelative(recentForce ? forcedAt : agent.lastActionAt)}
-                </p>
+                <p className="text-[11px] text-muted-foreground line-clamp-1">{agent.lastAction}</p>
+                <p className="text-[10px] text-muted-foreground/70 mt-0.5">{formatRelative(agent.lastActionAt)}</p>
               </div>
             </button>
           );
@@ -70,11 +64,17 @@ export function AgentGrid({ agents }: { agents: Agent[] }) {
       </div>
       <AgentDetailSheet
         agent={selected}
-        paused={!!(selected && paused[selected.id])}
-        forcedAt={selected ? forced[selected.id] : undefined}
         onOpenChange={(o) => !o && setSelectedId(null)}
-        onTogglePause={() => selected && setPaused((p) => ({ ...p, [selected.id]: !p[selected.id] }))}
-        onForce={() => selected && setForced((f) => ({ ...f, [selected.id]: Date.now() }))}
+        onTogglePause={async () => {
+          if (!selected) return;
+          await setAgentPaused(selected, !selected.paused);
+          onChange();
+        }}
+        onForce={async () => {
+          if (!selected) return;
+          await forceAgentRun(selected);
+          onChange();
+        }}
       />
     </Card>
   );
