@@ -8,6 +8,8 @@ export interface Agent {
   status: AgentStatus;
   lastAction: string;
   lastActionAt: number;
+  paused?: boolean;
+  forcedAt?: number;
 }
 
 export interface Alert {
