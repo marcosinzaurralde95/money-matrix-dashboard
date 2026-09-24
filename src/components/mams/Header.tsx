@@ -1,13 +1,13 @@
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Activity, Zap } from "lucide-react";
-import { useState } from "react";
+import type { Mode, Settings } from "@/lib/mams-db";
 
-type Mode = "Autónomo" | "Supervisado" | "Depuración";
-
-export function Header() {
-  const [mode, setMode] = useState<Mode>("Autónomo");
-  const [killed, setKilled] = useState(false);
+export function Header({ settings, onChange }: { settings: Settings | null; onChange: (p: Partial<Settings>) => void }) {
+  const mode: Mode = settings?.mode ?? "Autónomo";
+  const killed = settings?.kill_switch ?? false;
+  const setMode = (m: Mode) => onChange({ mode: m });
+  const setKilled = (k: boolean) => onChange({ kill_switch: k });
 
   const modeColors: Record<Mode, string> = {
     "Autónomo": "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",

@@ -1,19 +1,12 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Pause, Play, Zap } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import type { Agent } from "@/lib/mams-mock";
 import { formatRelative, formatTime } from "@/lib/mams-mock";
+import { fetchAgentTasks, type AgentTask } from "@/lib/mams-db";
 
-const TASKS = [
-  "Procesar cola de entrada",
-  "Sincronizar datos con Director",
-  "Generar reporte parcial",
-  "Validar resultados previos",
-  "Optimizar parámetros",
-  "Revisar métricas de conversión",
-];
 const DECISIONS = [
   "Priorizó tarea de alto impacto sobre baja urgencia",
   "Rechazó acción por superar límite de auto-aprobación",
@@ -29,25 +22,24 @@ function seeded(id: string) {
 
 interface Props {
   agent: Agent | null;
-  paused: boolean;
-  forcedAt?: number;
   onOpenChange: (open: boolean) => void;
-  onTogglePause: () => void;
-  onForce: () => void;
+  onTogglePause: () => void | Promise<void>;
+  onForce: () => void | Promise<void>;
 }
 
-export function AgentDetailSheet({ agent, paused, forcedAt, onOpenChange, onTogglePause, onForce }: Props) {
+export function AgentDetailSheet({ agent, onOpenChange, onTogglePause, onForce }: Props) {
+  const paused = !!agent?.paused;
+  const forcedAt = agent?.forcedAt;
+  const [tasks, setTasks] = useState<AgentTask[]>([]);
+  useEffect(() => {
+    if (!agent) return;
+    fetchAgentTasks(agent.id).then(setTasks).catch(() => setTasks([]));
+  }, [agent?.id, agent?.lastActionAt, agent?.forcedAt]);
   const details = useMemo(() => {
     if (!agent) return null;
     const r = seeded(agent.id);
     const now = Date.now();
-    const statuses = ["completada", "completada", "en curso", "fallida"] as const;
     return {
-      tasks: Array.from({ length: 6 }, (_, i) => ({
-        name: TASKS[Math.floor(r() * TASKS.length)],
-        status: statuses[Math.floor(r() * statuses.length)],
-        ts: now - i * 1000 * 60 * (3 + Math.floor(r() * 10)),
-      })),
       decisions: Array.from({ length: 4 }, (_, i) => ({
         text: DECISIONS[Math.floor(r() * DECISIONS.length)],
         confidence: Math.round(60 + r() * 39),
@@ -106,8 +98,9 @@ export function AgentDetailSheet({ agent, paused, forcedAt, onOpenChange, onTogg
             <section className="px-4 space-y-2">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tareas recientes</h4>
               <ul className="space-y-1.5">
-                {details.tasks.map((t, i) => (
-                  <li key={i} className="flex items-center justify-between rounded border border-border/60 bg-background/40 px-3 py-2">
+                {tasks.length === 0 && <li className="text-xs text-muted-foreground">Sin tareas registradas</li>}
+                {tasks.map((t) => (
+                  <li key={t.id} className="flex items-center justify-between rounded border border-border/60 bg-background/40 px-3 py-2">
                     <div className="min-w-0">
                       <p className="text-sm text-foreground truncate">{t.name}</p>
                       <p className="text-[10px] text-muted-foreground">{formatTime(t.ts)}</p>
