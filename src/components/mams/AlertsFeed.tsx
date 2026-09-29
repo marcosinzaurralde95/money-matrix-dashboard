@@ -25,8 +25,12 @@ export function AlertsFeed({ alerts }: { alerts: Alert[] }) {
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-foreground truncate">{a.message}</p>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className={`text-[10px] uppercase font-medium ${c.color}`}>{a.severity}</span>
-                  <span className="text-[10px] text-muted-foreground tabular-nums">{formatTime(a.ts)}</span>
+                  <span className={`text-[10px] uppercase font-medium ${c.color}`}>
+                    {a.severity}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground tabular-nums">
+                    {formatTime(a.ts)}
+                  </span>
                 </div>
               </div>
             </div>

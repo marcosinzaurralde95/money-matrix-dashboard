@@ -5,6 +5,7 @@ import { RevenueChart } from "@/components/mams/RevenueChart";
 import { AgentGrid } from "@/components/mams/AgentGrid";
 import { SystemHealth } from "@/components/mams/SystemHealth";
 import { AutonomySettings } from "@/components/mams/AutonomySettings";
+import { PendingApprovals } from "@/components/mams/PendingApprovals";
 import { AlertsFeed } from "@/components/mams/AlertsFeed";
 import { ActivityLog } from "@/components/mams/ActivityLog";
 import { useMamsData } from "@/hooks/useMamsData";
@@ -14,18 +15,43 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "MAMS — Sistema Matricial Agéntico de Dinero" },
-      { name: "description", content: "Panel en tiempo real para un sistema autónomo multi-agente de dinero." },
+      {
+        name: "description",
+        content: "Panel en tiempo real para un sistema autónomo multi-agente de dinero.",
+      },
     ],
   }),
   component: Dashboard,
 });
 
 function Dashboard() {
-  const { agents, alerts, activity, health, revenueSeries, revenue, settings, updateSettings, refresh, error } = useMamsData();
+  const {
+    agents,
+    alerts,
+    activity,
+    pendingApprovals,
+    health,
+    revenueSeries,
+    revenue,
+    settings,
+    updateSettings,
+    approvePending,
+    rejectPending,
+    refresh,
+    error,
+  } = useMamsData();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Header settings={settings} onChange={(p) => void updateSettings(p)} />
+      <Header
+        settings={settings}
+        onChange={(p) => void updateSettings(p)}
+        agents={agents}
+        alerts={alerts}
+        activity={activity}
+        revenue={revenue}
+        pendingApprovals={pendingApprovals}
+      />
       {error && (
         <div className="mx-6 mt-4 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-2 text-xs text-destructive">
           Error de conexión con la base de datos: {error}
@@ -33,10 +59,30 @@ function Dashboard() {
       )}
       <main className="p-6 space-y-6 max-w-[1600px] mx-auto">
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <MetricCard label="Ingresos Diarios" value={revenue.daily} target={TARGETS.daily} period="Hoy" />
-          <MetricCard label="Ingresos Semanales" value={revenue.weekly} target={TARGETS.weekly} period="Esta semana" />
-          <MetricCard label="Ingresos Mensuales" value={revenue.monthly} target={TARGETS.monthly} period="Este mes" />
-          <MetricCard label="Ingresos Anuales" value={revenue.yearly} target={TARGETS.yearly} period="Este año" />
+          <MetricCard
+            label="Ingresos Diarios"
+            value={revenue.daily}
+            target={TARGETS.daily}
+            period="Hoy"
+          />
+          <MetricCard
+            label="Ingresos Semanales"
+            value={revenue.weekly}
+            target={TARGETS.weekly}
+            period="Esta semana"
+          />
+          <MetricCard
+            label="Ingresos Mensuales"
+            value={revenue.monthly}
+            target={TARGETS.monthly}
+            period="Este mes"
+          />
+          <MetricCard
+            label="Ingresos Anuales"
+            value={revenue.yearly}
+            target={TARGETS.yearly}
+            period="Este año"
+          />
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -44,6 +90,14 @@ function Dashboard() {
             <RevenueChart data={revenueSeries} />
           </div>
           <SystemHealth health={health} />
+        </section>
+
+        <section className="grid grid-cols-1 gap-4">
+          <PendingApprovals
+            items={pendingApprovals}
+            onApprove={approvePending}
+            onReject={rejectPending}
+          />
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -59,7 +113,8 @@ function Dashboard() {
         </section>
 
         <footer className="text-center text-[11px] text-muted-foreground py-4">
-          Panel MAMS · Actualización automática cada 5s · Datos guardados en Lovable Cloud · Agentes simulados
+          Panel MAMS · Actualización en tiempo real (Supabase Realtime) · Lovable Cloud · Módulo de
+          Agentes Inteligentes
         </footer>
       </main>
     </div>

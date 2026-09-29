@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Pause, Play, Zap } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
@@ -17,7 +23,7 @@ const DECISIONS = [
 
 function seeded(id: string) {
   let s = [...id].reduce((a, c) => a + c.charCodeAt(0), 0);
-  return () => ((s = (s * 9301 + 49297) % 233280) / 233280);
+  return () => (s = (s * 9301 + 49297) % 233280) / 233280;
 }
 
 interface Props {
@@ -33,8 +39,10 @@ export function AgentDetailSheet({ agent, onOpenChange, onTogglePause, onForce }
   const [tasks, setTasks] = useState<AgentTask[]>([]);
   useEffect(() => {
     if (!agent) return;
-    fetchAgentTasks(agent.id).then(setTasks).catch(() => setTasks([]));
-  }, [agent?.id, agent?.lastActionAt, agent?.forcedAt]);
+    fetchAgentTasks(agent.id)
+      .then(setTasks)
+      .catch(() => setTasks([]));
+  }, [agent]);
   const details = useMemo(() => {
     if (!agent) return null;
     const r = seeded(agent.id);
@@ -51,10 +59,16 @@ export function AgentDetailSheet({ agent, onOpenChange, onTogglePause, onForce }
       })),
       cost: (r() * 8 + 1).toFixed(2),
     };
-  }, [agent?.id]);
+  }, [agent]);
 
   const totalCalls = details?.api.reduce((a, b) => a + b.calls, 0) ?? 0;
-  const statusText = paused ? "Pausado" : agent?.status === "active" ? "Activo" : agent?.status === "idle" ? "Inactivo" : "Error";
+  const statusText = paused
+    ? "Pausado"
+    : agent?.status === "active"
+      ? "Activo"
+      : agent?.status === "idle"
+        ? "Inactivo"
+        : "Error";
 
   return (
     <Sheet open={!!agent} onOpenChange={onOpenChange}>
@@ -63,7 +77,9 @@ export function AgentDetailSheet({ agent, onOpenChange, onTogglePause, onForce }
           <>
             <SheetHeader>
               <SheetTitle className="text-foreground">{agent.name}</SheetTitle>
-              <SheetDescription>{agent.role} · {statusText}</SheetDescription>
+              <SheetDescription>
+                {agent.role} · {statusText}
+              </SheetDescription>
             </SheetHeader>
 
             <div className="flex gap-2 px-4">
@@ -76,36 +92,69 @@ export function AgentDetailSheet({ agent, onOpenChange, onTogglePause, onForce }
               </Button>
             </div>
             {forcedAt && (
-              <p className="px-4 text-[11px] text-muted-foreground">Ejecución forzada {formatRelative(forcedAt)}</p>
+              <p className="px-4 text-[11px] text-muted-foreground">
+                Ejecución forzada {formatRelative(forcedAt)}
+              </p>
             )}
 
             <section className="px-4 space-y-2">
               <div className="flex items-baseline justify-between">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Consumo de API (12h)</h4>
-                <span className="text-xs text-foreground">{totalCalls} llamadas · ${details.cost}</span>
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Consumo de API (12h)
+                </h4>
+                <span className="text-xs text-foreground">
+                  {totalCalls} llamadas · ${details.cost}
+                </span>
               </div>
               <div className="h-28">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={details.api}>
-                    <XAxis dataKey="h" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-                    <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", fontSize: 12 }} />
-                    <Area type="monotone" dataKey="calls" name="Llamadas" stroke="var(--primary)" fill="var(--primary)" fillOpacity={0.2} />
+                    <XAxis
+                      dataKey="h"
+                      tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        background: "var(--popover)",
+                        border: "1px solid var(--border)",
+                        fontSize: 12,
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="calls"
+                      name="Llamadas"
+                      stroke="var(--primary)"
+                      fill="var(--primary)"
+                      fillOpacity={0.2}
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
             </section>
 
             <section className="px-4 space-y-2">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tareas recientes</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Tareas recientes
+              </h4>
               <ul className="space-y-1.5">
-                {tasks.length === 0 && <li className="text-xs text-muted-foreground">Sin tareas registradas</li>}
+                {tasks.length === 0 && (
+                  <li className="text-xs text-muted-foreground">Sin tareas registradas</li>
+                )}
                 {tasks.map((t) => (
-                  <li key={t.id} className="flex items-center justify-between rounded border border-border/60 bg-background/40 px-3 py-2">
+                  <li
+                    key={t.id}
+                    className="flex items-center justify-between rounded border border-border/60 bg-background/40 px-3 py-2"
+                  >
                     <div className="min-w-0">
                       <p className="text-sm text-foreground truncate">{t.name}</p>
                       <p className="text-[10px] text-muted-foreground">{formatTime(t.ts)}</p>
                     </div>
-                    <span className={`text-[10px] uppercase tracking-wider ${t.status === "fallida" ? "text-destructive" : t.status === "en curso" ? "text-primary" : "text-muted-foreground"}`}>
+                    <span
+                      className={`text-[10px] uppercase tracking-wider ${t.status === "fallida" ? "text-destructive" : t.status === "en curso" ? "text-primary" : "text-muted-foreground"}`}
+                    >
                       {t.status}
                     </span>
                   </li>
@@ -114,12 +163,19 @@ export function AgentDetailSheet({ agent, onOpenChange, onTogglePause, onForce }
             </section>
 
             <section className="px-4 pb-6 space-y-2">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Decisiones tomadas</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Decisiones tomadas
+              </h4>
               <ul className="space-y-1.5">
                 {details.decisions.map((d, i) => (
-                  <li key={i} className="rounded border border-border/60 bg-background/40 px-3 py-2">
+                  <li
+                    key={i}
+                    className="rounded border border-border/60 bg-background/40 px-3 py-2"
+                  >
                     <p className="text-sm text-foreground">{d.text}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">Confianza {d.confidence}% · {formatRelative(d.ts)}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      Confianza {d.confidence}% · {formatRelative(d.ts)}
+                    </p>
                   </li>
                 ))}
               </ul>
