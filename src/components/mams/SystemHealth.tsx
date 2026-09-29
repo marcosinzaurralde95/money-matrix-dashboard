@@ -4,7 +4,17 @@ interface Props {
   health: { cpu: number; memory: number; apiPerMin: number; activeTasks: number };
 }
 
-function Gauge({ label, value, suffix = "%", max = 100 }: { label: string; value: number; suffix?: string; max?: number }) {
+function Gauge({
+  label,
+  value,
+  suffix = "%",
+  max = 100,
+}: {
+  label: string;
+  value: number;
+  suffix?: string;
+  max?: number;
+}) {
   const pct = (value / max) * 100;
   const color = pct > 80 ? "bg-red-500" : pct > 60 ? "bg-amber-400" : "bg-emerald-400";
   return (

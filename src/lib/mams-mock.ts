@@ -47,8 +47,16 @@ const AGENT_SEED: Omit<Agent, "status" | "lastAction" | "lastActionAt">[] = [
 
 const ACTIONS: Record<string, string[]> = {
   director: ["Asignó tareas a 4 agentes", "Revisó OKRs trimestrales", "Aprobó $240 en publicidad"],
-  researcher: ["Analizó 128 páginas de competencia", "Identificó 3 tendencias emergentes", "Actualizó índice de palabras clave"],
-  creator: ["Generó 5 publicaciones largas", "Produjo 12 variantes sociales", "Redactó secuencia de email"],
+  researcher: [
+    "Analizó 128 páginas de competencia",
+    "Identificó 3 tendencias emergentes",
+    "Actualizó índice de palabras clave",
+  ],
+  creator: [
+    "Generó 5 publicaciones largas",
+    "Produjo 12 variantes sociales",
+    "Redactó secuencia de email",
+  ],
   marketer: ["Lanzó campaña en LinkedIn", "Inició prueba A/B", "Programó 8 publicaciones"],
   sales: ["Cerró trato: $189", "Envió 24 correos en frío", "Agendó 3 demos"],
   analyst: ["Calculó deltas de conversión", "Generó reporte de embudo", "Detectó anomalía en CTR"],
@@ -74,7 +82,9 @@ export function generateAgents(): Agent[] {
   });
 }
 
-export function generateRevenueSeries(days = 30): { date: string; revenue: number; target: number }[] {
+export function generateRevenueSeries(
+  days = 30,
+): { date: string; revenue: number; target: number }[] {
   const out = [];
   const today = new Date();
   for (let i = days - 1; i >= 0; i--) {
@@ -149,7 +159,11 @@ export function currentRevenue() {
 }
 
 export function formatTime(ts: number) {
-  return new Date(ts).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  return new Date(ts).toLocaleTimeString("es-ES", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 }
 
 export function formatRelative(ts: number) {

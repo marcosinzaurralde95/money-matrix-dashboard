@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Agent, Alert, ActivityEntry, Severity, AgentStatus } from "@/lib/mams-mock";
+import { executeAgentReasoning } from "@/lib/ai-agent-engine";
 
 export type Mode = "Autónomo" | "Supervisado" | "Depuración";
 
@@ -17,6 +18,18 @@ export interface AgentTask {
   name: string;
   status: string;
   ts: number;
+}
+
+export interface PendingApproval {
+  id: string;
+  agentId: string | null;
+  agentName: string;
+  action: string;
+  amount: number;
+  status: "pending" | "approved" | "rejected";
+  requestedAt: number;
+  reviewedAt?: number;
+  reviewedBy?: string;
 }
 
 export interface RevenueSummary {
@@ -44,9 +57,18 @@ export async function fetchAgents(): Promise<Agent[]> {
 }
 
 export async function fetchAlerts(): Promise<Alert[]> {
-  const { data, error } = await supabase.from("alerts").select("*").order("created_at", { ascending: false }).limit(10);
+  const { data, error } = await supabase
+    .from("alerts")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(10);
   if (error) throw error;
-  return data.map((a) => ({ id: a.id, severity: a.severity as Severity, message: a.message, ts: ts(a.created_at) }));
+  return data.map((a) => ({
+    id: a.id,
+    severity: a.severity as Severity,
+    message: a.message,
+    ts: ts(a.created_at),
+  }));
 }
 
 export async function fetchActivity(): Promise<ActivityEntry[]> {
@@ -56,7 +78,83 @@ export async function fetchActivity(): Promise<ActivityEntry[]> {
     .order("created_at", { ascending: false })
     .limit(30);
   if (error) throw error;
-  return data.map((a) => ({ id: a.id, agent: a.agent_name, action: a.action, ts: ts(a.created_at) }));
+  return data.map((a) => ({
+    id: a.id,
+    agent: a.agent_name,
+    action: a.action,
+    ts: ts(a.created_at),
+  }));
+}
+
+export async function fetchPendingApprovals(): Promise<PendingApproval[]> {
+  const { data, error } = await supabase
+    .from("pending_approvals")
+    .select("*")
+    .eq("status", "pending")
+    .order("requested_at", { ascending: false })
+    .limit(15);
+  if (error) return [];
+  return (data || []).map((p) => ({
+    id: p.id,
+    agentId: p.agent_id,
+    agentName: p.agent_name,
+    action: p.action,
+    amount: Number(p.amount),
+    status: p.status as "pending" | "approved" | "rejected",
+    requestedAt: ts(p.requested_at),
+    reviewedAt: p.reviewed_at ? ts(p.reviewed_at) : undefined,
+    reviewedBy: p.reviewed_by ?? undefined,
+  }));
+}
+
+export async function approvePendingRequest(id: string, reviewer = "Admin") {
+  const now = new Date().toISOString();
+
+  // Get item
+  const { data: item } = await supabase.from("pending_approvals").select("*").eq("id", id).single();
+
+  if (!item) return;
+
+  // Mark approved
+  await supabase
+    .from("pending_approvals")
+    .update({ status: "approved", reviewed_at: now, reviewed_by: reviewer })
+    .eq("id", id);
+
+  // If there's an amount, record transaction
+  if (item.amount > 0) {
+    await supabase.from("transactions").insert({
+      agent_id: item.agent_id,
+      amount: Number(item.amount),
+      description: `[Aprobado por ${reviewer}] ${item.action}`,
+    });
+  }
+
+  // Log activity
+  await supabase.from("activity_log").insert({
+    agent_id: item.agent_id,
+    agent_name: item.agent_name,
+    action: `Aprobado por ${reviewer}: $${item.amount}`,
+  });
+}
+
+export async function rejectPendingRequest(id: string, reviewer = "Admin") {
+  const now = new Date().toISOString();
+
+  const { data: item } = await supabase.from("pending_approvals").select("*").eq("id", id).single();
+
+  if (!item) return;
+
+  await supabase
+    .from("pending_approvals")
+    .update({ status: "rejected", reviewed_at: now, reviewed_by: reviewer })
+    .eq("id", id);
+
+  await supabase.from("activity_log").insert({
+    agent_id: item.agent_id,
+    agent_name: item.agent_name,
+    action: `Rechazado por ${reviewer}: ${item.action}`,
+  });
 }
 
 export async function fetchSettings(): Promise<Settings> {
@@ -87,7 +185,10 @@ export async function fetchRevenue(): Promise<{
   const { data, error } = await supabase.rpc("revenue_overview");
   if (error) throw error;
   const d = data as unknown as {
-    daily: number; weekly: number; monthly: number; yearly: number;
+    daily: number;
+    weekly: number;
+    monthly: number;
+    yearly: number;
     series: { day: string; revenue: number }[];
   };
   return {
@@ -98,7 +199,10 @@ export async function fetchRevenue(): Promise<{
       yearly: Math.round(Number(d.yearly)),
     },
     series: (d.series ?? []).map((p) => ({
-      date: new Date(p.day + "T12:00:00").toLocaleDateString("es-ES", { month: "short", day: "numeric" }),
+      date: new Date(p.day + "T12:00:00").toLocaleDateString("es-ES", {
+        month: "short",
+        day: "numeric",
+      }),
       revenue: Math.round(Number(p.revenue)),
       target: 333,
     })),
@@ -130,59 +234,92 @@ export async function forceAgentRun(agent: Agent) {
   const now = new Date().toISOString();
   const { error } = await supabase
     .from("agents")
-    .update({ forced_at: now, status: "active", last_action: "Ejecución forzada manualmente", last_action_at: now })
+    .update({
+      forced_at: now,
+      status: "active",
+      last_action: "Ejecución forzada manualmente",
+      last_action_at: now,
+    })
     .eq("id", agent.id);
   if (error) throw error;
   await Promise.all([
-    supabase.from("agent_tasks").insert({ agent_id: agent.id, name: "Ejecución forzada manualmente", status: "en curso" }),
-    supabase.from("activity_log").insert({ agent_id: agent.id, agent_name: agent.name, action: "Ejecución forzada manualmente" }),
+    supabase
+      .from("agent_tasks")
+      .insert({ agent_id: agent.id, name: "Ejecución forzada manualmente", status: "en curso" }),
+    supabase.from("activity_log").insert({
+      agent_id: agent.id,
+      agent_name: agent.name,
+      action: "Ejecución forzada manualmente",
+    }),
   ]);
 }
 
-// --- Simulated agent work, written to the database (stand-in for real agents) ---
-const ACTIONS: Record<string, string[]> = {
-  director: ["Asignó tareas a 4 agentes", "Revisó OKRs trimestrales", "Aprobó $240 en publicidad"],
-  researcher: ["Analizó 128 páginas de competencia", "Identificó 3 tendencias emergentes", "Actualizó índice de palabras clave"],
-  creator: ["Generó 5 publicaciones largas", "Produjo 12 variantes sociales", "Redactó secuencia de email"],
-  marketer: ["Lanzó campaña en LinkedIn", "Inició prueba A/B", "Programó 8 publicaciones"],
-  sales: ["Cerró trato", "Envió 24 correos en frío", "Agendó 3 demos"],
-  analyst: ["Calculó deltas de conversión", "Generó reporte de embudo", "Detectó anomalía en CTR"],
-  quality: ["Revisó 18 resultados", "Marcó 1 alucinación", "Aprobó lote de contenido"],
-  compliance: ["Escaneó 42 docs por PII", "Revisó actualización de TOS", "Validó 3 divulgaciones"],
-  finance: ["Reconcilió pagos de Stripe", "Actualizó modelo de flujo", "Registró ingresos"],
-};
-const ALERTS: { severity: Severity; message: string }[] = [
-  { severity: "info", message: "El Director rebalanceó la carga de los agentes" },
-  { severity: "info", message: "Nueva campaña desplegada por Marketing" },
-  { severity: "warning", message: "Límite de API cercano al máximo (82%)" },
-  { severity: "warning", message: "Conversión de Ventas bajo el promedio de 7 días" },
-  { severity: "critical", message: "Cumplimiento marcó un mensaje saliente" },
-  { severity: "info", message: "Calidad aprobó 24 artefactos" },
-];
-const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
+const pick = <T>(a: T[]) => a[Math.floor(Math.random() * a.length)];
 
 export async function simulateTick(agents: Agent[]) {
+  const settings = await fetchSettings().catch(() => null);
+  if (settings?.kill_switch) return;
+
   const candidates = agents.filter((a) => !a.paused);
   if (!candidates.length) return;
-  const agent = pick(candidates);
-  const r = Math.random();
-  const status: AgentStatus = r < 0.8 ? "active" : r < 0.95 ? "idle" : "error";
-  let action = pick(ACTIONS[agent.id] ?? ["Procesó tarea"]);
-  const jobs: PromiseLike<unknown>[] = [];
 
-  if ((agent.id === "sales" || agent.id === "finance") && Math.random() < 0.7) {
-    const amount = Math.round(40 + Math.random() * 160);
-    action = agent.id === "sales" ? `Cerró trato: $${amount}` : `Registró $${amount} de ingresos`;
-    jobs.push(supabase.from("transactions").insert({ agent_id: agent.id, amount, description: action }));
-  }
+  const agent = pick(candidates);
+  const autoApprovalLimit = settings?.auto_approval_limit ?? 100;
+  const humanApprovalAbove = settings?.human_approval_above ?? 1000;
+
+  const result = await executeAgentReasoning(agent, autoApprovalLimit, humanApprovalAbove);
+
+  const jobs: PromiseLike<unknown>[] = [];
   const now = new Date().toISOString();
-  jobs.push(supabase.from("agents").update({ status, last_action: action, last_action_at: now }).eq("id", agent.id));
-  jobs.push(supabase.from("activity_log").insert({ agent_id: agent.id, agent_name: agent.name, action }));
-  jobs.push(supabase.from("agent_tasks").insert({ agent_id: agent.id, name: action, status: status === "error" ? "fallida" : "completada" }));
-  if (status === "error") {
-    jobs.push(supabase.from("alerts").insert({ severity: "critical", message: `${agent.name} reportó un error en su última tarea` }));
-  } else if (Math.random() < 0.2) {
-    jobs.push(supabase.from("alerts").insert(pick(ALERTS)));
+
+  if (result.requiresHumanApproval && result.approvalAmount) {
+    jobs.push(
+      supabase.from("pending_approvals").insert({
+        agent_id: agent.id,
+        agent_name: agent.name,
+        action: result.action,
+        amount: result.approvalAmount,
+        status: "pending",
+      }),
+    );
+  } else if (result.amount && result.amount > 0) {
+    jobs.push(
+      supabase.from("transactions").insert({
+        agent_id: agent.id,
+        amount: result.amount,
+        description: `${agent.name}: ${result.action}`,
+      }),
+    );
   }
+
+  jobs.push(
+    supabase
+      .from("agents")
+      .update({ status: result.status, last_action: result.action, last_action_at: now })
+      .eq("id", agent.id),
+  );
+
+  jobs.push(
+    supabase
+      .from("activity_log")
+      .insert({ agent_id: agent.id, agent_name: agent.name, action: result.action }),
+  );
+
+  jobs.push(
+    supabase.from("agent_tasks").insert({
+      agent_id: agent.id,
+      name: result.action,
+      status: result.status === "error" ? "fallida" : "completada",
+    }),
+  );
+
+  if (result.alert) {
+    jobs.push(
+      supabase
+        .from("alerts")
+        .insert({ severity: result.alert.severity, message: result.alert.message }),
+    );
+  }
+
   await Promise.all(jobs);
 }

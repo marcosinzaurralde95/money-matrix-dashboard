@@ -48,15 +48,21 @@ export function AgentGrid({ agents, onChange }: { agents: Agent[]; onChange: () 
                     <span
                       className={`w-2 h-2 rounded-full shadow-[0_0_8px] ${statusColor[st]} ${st === "active" ? "animate-pulse" : ""}`}
                     />
-                    <span className="text-sm font-semibold text-foreground truncate">{agent.name}</span>
+                    <span className="text-sm font-semibold text-foreground truncate">
+                      {agent.name}
+                    </span>
                   </div>
                   <p className="text-[11px] text-muted-foreground mt-0.5">{agent.role}</p>
                 </div>
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{statusLabel[st]}</span>
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  {statusLabel[st]}
+                </span>
               </div>
               <div className="mt-2 pt-2 border-t border-border/40">
                 <p className="text-[11px] text-muted-foreground line-clamp-1">{agent.lastAction}</p>
-                <p className="text-[10px] text-muted-foreground/70 mt-0.5">{formatRelative(agent.lastActionAt)}</p>
+                <p className="text-[10px] text-muted-foreground/70 mt-0.5">
+                  {formatRelative(agent.lastActionAt)}
+                </p>
               </div>
             </button>
           );
